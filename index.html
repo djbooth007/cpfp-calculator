@@ -1,0 +1,80 @@
+<html>
+
+<head>
+
+	<title>Child Pays For Parent calculator</title>
+	
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<meta name="description" content="Child Pays For Parent calculator.">
+
+	<script>
+		var preloaded, cpfp; var version = 0.1;
+	
+		link=document.createElement('script');
+		link.src='cpfp.js?v='+version;
+		document.getElementsByTagName('head')[0].appendChild(link);	
+		
+		// Load components when ready
+		setup_timer = setInterval(function(){ 		
+			if(typeof cpfp === "function"){ cpfp = new cpfp(); preloaded = 'Y'; }			
+			if(preloaded == 'Y' && document.readyState === 'complete'){ clearInterval(setup_timer);	}
+		},50);	
+	</script>
+
+	<link rel="icon" type="image/png" href="calc-32.png">
+	<link rel="icon" type="image/png" href="calc-64.png">
+	<link rel="icon" type="image/png" href="calc-192.png">
+	<link rel="icon" type="image/png" href="calc-256.png">
+	
+	<style>
+		body{ font-family: Arial; font-size:1.5rem; padding:10px; color:#cbcbcb; line-height:2rem; background: #141414; }
+		a{ color:green; }
+		.title{ font-weight:700; font-size:2rem; }
+		.subtitle{ margin-top:20px; }
+		.block{ display:block; }
+		.iblock{ display:inline-block;  }
+		.calcwrapper{ border:2px solid black; border-radius:10px; padding:20px; margin-top:50px; background:#2b2b2b; }
+		input{ font-size:1.5rem; border:2px solid #cccccc; padding: 5px 10px 5px 10px; color:black; margin-top:10px; width:100px; border-radius:5px; background: #e6e6e6; }
+		.btn{ border: #235b03; background: #235b03; color:white; border-radius:5px; padding:5px 10px 5px 10px; margin-top:10px; font-size:1.5rem; cursor:pointer; }
+		.results{ margin-top:20px; padding-top:20px; }
+		.col{ width:400px; max-width:45%; margin-right:50px; display:inline-block; vertical-align:top; }
+		.memblk{ width:150px; display: inline-block; }
+		#backtest_results{ display:block; }
+		.card{  border: 1px solid #6a6a6a; background: #141414; padding: 20px; border-radius:10px; padding:10px; line-height:2.5rem; margin-bottom:10px; box-shadow: 0px 0px 15px 5px rgba(0,0,0,0.55); }
+		.dark_card{ background: #235b03; color:white; border-radius:5px; padding:10px; line-height:2.5rem; }
+		#custom{ display:block; margin:20px 0 20px 0; }
+		.bottom { padding:30px 0 30px 10px; }
+		.bottom a { margin-right:30px;  }
+	</style>
+
+</head>
+
+<body>
+
+	<div class="title block">CPFP Calculator</div>
+	<div class="subtitle block">Bitcoin's Child Pays For Parent (CPFP) is a fee bumping technique where a child transaction is paying for all associated parent transactions so that parents and child can be confirmed sooner.</div>
+
+	<div class="calcwrapper">
+	
+		<div class="block">
+			<div class="subtitle">Child TX ID: <input type="text" id="child_tx_id" style="width:50%;max-width:1000px;"></div>
+			<div id="custom">Desired Fee: <input type="text" id="custom_fee" class="iblock"> <span class="iblock">&nbsp;sat/vB</span></div>
+		
+			<button class="btn" onclick="cpfp.start()">Calculate Fee</button>
+		</div>
+		
+		<div class="results col">			
+			<div id="backtest_results"></div>		
+		</div>
+		
+		<div class="results col">
+			<div id="recommendations"></div>	
+		</div>
+	
+	</div>
+
+	<div class="bottom">Developer: DJ Booth <a href="https://djbooth007.com/donate/" target="_djbooth007">( Donate )</a> Source on <a href="https://github.com/djbooth007/cpfp-calculator/" target="_github">Github</a> Powered by <a href="https://mempool.space/" target="_mempoolspace">Mempool.Space</a></div>
+
+</body>
+
+</html>
