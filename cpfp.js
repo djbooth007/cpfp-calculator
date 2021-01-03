@@ -1,8 +1,7 @@
 //////////////////////////////////////////
 //
 // Child Pays For Parent Calculator
-// ALPHA v0.3
-// DO NOT RELY ON THIS VERSION
+// BETA v0.1
 //
 //////////////////////////////////////////
 
@@ -20,8 +19,6 @@ var cpfp=function(){
 			cpfp.call_api('tx/'+child_tx_id);
 
 			document.getElementById('recommendations').innerHTML = 'hodl on...';
-			
-			//cpfp.test();
 		}
 	}
 	
