@@ -32,6 +32,7 @@ var cpfp=function(){
 			
 		// begin recursive backtest from child transaction
 		child_tx_id = document.getElementById('child_tx_id').value;
+		
 		if(child_tx_id != ""){
 			tx_list[child_tx_id] = [];
 			
@@ -47,24 +48,12 @@ var cpfp=function(){
 		var provider = cors_proxy+'https://mempool.space/api/';
 		var xhr_api = new XMLHttpRequest();
 		xhr_api.onload = function() { 
-			if(this.response !== null){ cpfp.process_api_data(this.response, endpoint); }
+			if(this.response !== null){ cpfp.backtest(this.response); }
 		} 	
 		xhr_api.open( 'GET', provider+endpoint );
 		xhr_api.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 		xhr_api.responseType = 'json';
 		xhr_api.send();
-	}
-
-	this.process_api_data = function(data,endpoint){
-
-		if(endpoint == 'v1/fees/recommended'){ 
-			fee_rates = data; 
-			cpfp.display_fee_rates();
-		}
-		
-		if(endpoint.substring(0,3) == 'tx/'){ 
-			cpfp.backtest(data);
-		}
 	}
 	
 	this.backtest = function(data){
