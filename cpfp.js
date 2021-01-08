@@ -7,7 +7,26 @@
 
 var cpfp=function(){
 
+	
 	var tx_list = []; var child_tx_id;
+	
+	// check for keyboard input
+	
+	document.getElementById('child_tx_id').addEventListener("keyup", function(event) {
+		// Number 13 is the "Enter" key on the keyboard
+		if(event.keyCode === 13) {
+			event.preventDefault();
+			document.getElementById("custom_fee").focus();
+		}
+	});
+	
+	document.getElementById('custom_fee').addEventListener("keyup", function(event) {
+		// Number 13 is the "Enter" key on the keyboard
+		if(event.keyCode === 13) {
+			event.preventDefault();
+			cpfp.start();
+		}
+	});
 	
 	this.start = function(){
 			
