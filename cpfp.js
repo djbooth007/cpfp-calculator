@@ -34,9 +34,12 @@ var cpfp=function(){
 		child_tx_id = document.getElementById('child_tx_id').value;
 		
 		if(child_tx_id != ""){
+						
 			tx_list[child_tx_id] = [];
 			
 			cpfp.call_api('tx/'+child_tx_id);
+
+			document.getElementById('backtest_results').innerHTML = ''; // clear previous results
 
 			document.getElementById('recommendations').innerHTML = 'hodl on...';
 		}
