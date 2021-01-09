@@ -8,7 +8,7 @@
 var cpfp=function(){
 
 	
-	var tx_list = []; var child_tx_id;
+	var tx_list = []; var child_tx_id; var parent_count = 0;
 	
 	// check for keyboard input
 	
@@ -33,6 +33,8 @@ var cpfp=function(){
 		// begin recursive backtest from child transaction
 		child_tx_id = document.getElementById('child_tx_id').value;
 		
+		parent_count = 0;
+		
 		if(child_tx_id != ""){
 						
 			tx_list[child_tx_id] = [];
@@ -46,7 +48,6 @@ var cpfp=function(){
 	}
 	
 	this.call_api = function(endpoint){
-		
 		var cors_proxy = 'https://cors-anywhere.herokuapp.com/';	
 		var provider = cors_proxy+'https://mempool.space/api/';
 		var xhr_api = new XMLHttpRequest();
@@ -152,8 +153,10 @@ var cpfp=function(){
 	
 	this.display_card = function(txid,size,fee){
 		
+		if(txid != child_tx_id){ parent_count++; var label = '<span class="label" style="background: #044d6a;">Parent '+parent_count+'</span>'; }else{ var label = '<span class="label" style="background: #235b03;">Child</span>'; }
+		
 		var string = '<div class="card">';
-		string += '<span class="memblk"><b>TX ID:</b></span> <a href="https://mempool.space/tx/'+txid+'" target="_mempoolspace">'+cpfp.trunc(txid)+'</a><br/>';
+		string += '<span class="memblk">'+label+'<b>TX ID:</b></span><a href="https://mempool.space/tx/'+txid+'" target="_mempoolspace">'+cpfp.trunc(txid)+'</a><br/>';
 		string += '<span class="memblk"><b>Size:</b></span>'+size+' vB<br/>';
 		string += '<span class="memblk"><b>Fee:</b></span>'+fee+' sats<br/>';
 		string += '</div>';
