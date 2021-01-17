@@ -130,7 +130,7 @@ var cpfp=function(){
 				accumulative_size += parseFloat(tx_list[key]['vsize']);
 			}			
 		});
-		
+			
 		var desired_fee = parseFloat(document.getElementById('custom_fee').value);
 		var recommendation = cpfp.child_to_pay(desired_fee, accumulative_size, accumulative_fees);
 		
@@ -153,17 +153,19 @@ var cpfp=function(){
 	
 	this.display_card = function(txid,size,fee){
 		
-		if(txid != child_tx_id){ parent_count++; var label = '<span class="label" style="background: #044d6a;">Parent '+parent_count+'</span>'; }else{ var label = '<span class="label" style="background: #235b03;">Child</span>'; }
-		
-		var string = '<div class="card">';
-		string += '<span class="memblk">'+label+'<b>TX ID:</b></span><a href="https://mempool.space/tx/'+txid+'" target="_mempoolspace">'+cpfp.trunc(txid)+'</a><br/>';
-		string += '<span class="memblk"><b>Size:</b></span>'+size+' vB<br/>';
-		string += '<span class="memblk"><b>Fee:</b></span>'+fee+' sats<br/>';
-		string += '</div>';
-				
-		const div = document.createElement('div');	
-		div.innerHTML = string;
-		document.getElementById('backtest_results').appendChild(div); 		
+		if(!document.getElementById(txid)){
+			if(txid != child_tx_id){ parent_count++; var label = '<span class="label" style="background: #044d6a;">Parent '+parent_count+'</span>'; }else{ var label = '<span class="label" style="background: #235b03;">Child</span>'; }
+			
+			var string = '<div class="card" id="'+txid+'">';
+			string += '<span class="memblk">'+label+'<b>TX ID:</b></span><a href="https://mempool.space/tx/'+txid+'" target="_mempoolspace">'+cpfp.trunc(txid)+'</a><br/>';
+			string += '<span class="memblk"><b>Size:</b></span>'+size+' vB<br/>';
+			string += '<span class="memblk"><b>Fee:</b></span>'+fee+' sats<br/>';
+			string += '</div>';
+					
+			const div = document.createElement('div');	
+			div.innerHTML = string;
+			document.getElementById('backtest_results').appendChild(div); 	
+		}		
 	}
 
 	this.trunc = function(id){
