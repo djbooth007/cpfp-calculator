@@ -69,11 +69,10 @@ var cpfp=function(){
 		tx_list[data.txid]['vsize'] = vsize;
 		tx_list[data.txid]['fee'] = data.fee;
 		
+		// only look at unconfirmed parents
 		if(data.status.confirmed === false){ 
 			cpfp.display_card(data.txid,vsize,data.fee); 
-		}
-	
-		if(data.status.confirmed === false){
+
 			var list = [];			
 			for(var j = 0; j < data.vin.length; j++){ 
 				list.push(data.vin[j]['txid']);
