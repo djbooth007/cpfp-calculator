@@ -48,7 +48,7 @@ var cpfp=function(){
 	}
 	
 	this.call_api = function(endpoint){
-		var cors_proxy = 'https://cors-anywhere.herokuapp.com/';	
+		var cors_proxy = 'https://cors-proxy.djbooth007.com/';	
 		var provider = cors_proxy+'https://mempool.space/api/';
 		var xhr_api = new XMLHttpRequest();
 		xhr_api.onload = function() { 
