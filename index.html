@@ -46,6 +46,7 @@
 		#custom{ display:block; margin:20px 0 20px 0; }
 		.bottom { padding:30px 0 30px 10px; }
 		.bottom a { margin-right:30px;  }
+		.heading{ color:green; font-weight:700; margin-top:20px; display:block; }
 	</style>
 
 </head>
@@ -58,6 +59,7 @@
 		Bitcoin's Child Pays For Parent (CPFP) is a fee bumping technique for a pending (unconfirmed) transaction: aka The Parent. <br/>
 		A second transaction (The Child) spends the output of the Parent(s), and pays for all Parent transaction fees so that both Parent(s) and Child are confirmed together, and sooner.
 	</div>
+
 
 	<div class="calcwrapper">
 	
@@ -76,6 +78,19 @@
 			<div id="recommendations"></div>	
 		</div>
 	
+	</div>
+	
+		
+	<div class="heading">How To Use</div>
+	<div id="how_to_instructions">
+		<ol>
+		<li>Generate a new Bitcoin address in your wallet.</li>
+		<li><b>Make sure RBF (Replace By Fee) is ON.</b> Send some or all of the unconfirmed balance (from the parent) to that address.</li>
+		<li>Copy the new transaction ID (TX ID) and paste it in the 'Child TX ID' field.</li>
+		<li>Enter the desired sats/vB amount. This can be determined by looking at the range of sat/vB in recently <a href="https://mempool.space/" target="_mempoolspace">confirmed blocks</a>.</li>
+		<li>Click 'Calculate Fee' or press Enter</li>
+		<li>Perform RBF (Replace By Fee) with the calculated result highlighted as 'Child to Pay'.</li>
+		</ol>		
 	</div>
 
 	<div class="bottom">Developer: DJ Booth <a href="https://djbooth007.com/donate/" target="_djbooth007">( Donate )</a> Source on <a href="https://github.com/djbooth007/cpfp-calculator/" target="_github">Github</a> Powered by <a href="https://mempool.space/" target="_mempoolspace">Mempool.Space</a></div>

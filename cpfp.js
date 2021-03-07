@@ -68,8 +68,8 @@ var cpfp=function(){
 		
 		tx_list[data.txid]['vsize'] = vsize;
 		tx_list[data.txid]['fee'] = data.fee;
-		
-		// only look at unconfirmed parents
+	
+		// only look at unconfirmed parents	
 		if(data.status.confirmed === false){ 
 			cpfp.display_card(data.txid,vsize,data.fee); 
 
@@ -140,7 +140,7 @@ var cpfp=function(){
 		
 		string += '<div class="dark_card">';
 		string += '<b>Child to Pay</b><br/>';
-		string += recommendation+' sats<br/>';
+		string += recommendation+' sat/vB<br/>';
 		string += '</div>';
 		
 		document.getElementById('recommendations').innerHTML = string;	
