@@ -101,7 +101,6 @@ var cpfp=function(){
 	}
 	
 	this.backtest_list = function(list){
-
 		var j = 0;
 		Object.keys(list).forEach(function(key){
 			setTimeout(function(){ 	cpfp.call_api('tx/'+list[key]); }, 500*j); // prevent bombarding API
@@ -111,7 +110,7 @@ var cpfp=function(){
 	
 	this.check_complete_list = function(){
 		var finished = 'Y'; 
-		
+
 		for(var j = 0; j < tx_list.length; j++){ 		
 			if(tx_list[j]['confirmed'] == 'undefined'){ finished = 'N'; }
 		}
@@ -121,17 +120,21 @@ var cpfp=function(){
 	
 	this.calc = function(){
 			
-		var accumulative_fees = 0; var accumulative_size = 0;
+		var accumulative_fees = 0; var accumulative_size = 0; var unconfirmed_parent_count = 0;
 		
 		Object.keys(tx_list).forEach(function(key){
 			if(tx_list[key]['confirmed'] == false){
+				
+				if(key != child_tx_id){ unconfirmed_parent_count++; }
+				
 				accumulative_fees += parseFloat(tx_list[key]['fee']);
 				accumulative_size += parseFloat(tx_list[key]['vsize']);
 			}			
 		});
-			
+
 		var desired_fee = parseFloat(document.getElementById('custom_fee').value);
 		var recommendation = cpfp.child_to_pay(desired_fee, accumulative_size, accumulative_fees);
+		if(recommendation < 0){ recommendation = 'Desired fee is too low.'; }else{ recommendation = recommendation+' sat/vB'; }
 		
 		var string = '<div class="card">';
 		string += '<span class="memblk"><b>Total Size:</b></span>'+accumulative_size+' vB<br/>';
@@ -139,8 +142,14 @@ var cpfp=function(){
 		string += '</div>';
 		
 		string += '<div class="dark_card">';
-		string += '<b>Child to Pay</b><br/>';
-		string += recommendation+' sat/vB<br/>';
+		
+		if(unconfirmed_parent_count > 0){			
+			string += '<b>Child to Pay</b><br/>';
+			string += recommendation+'<br/>';
+		}else{
+			string += 'All Parents Already Confirmed<br/>';			
+		}
+		
 		string += '</div>';
 		
 		document.getElementById('recommendations').innerHTML = string;	
