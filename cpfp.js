@@ -134,7 +134,7 @@ var cpfp=function(){
 
 		var desired_fee = parseFloat(document.getElementById('custom_fee').value);
 		var recommendation = cpfp.child_to_pay(desired_fee, accumulative_size, accumulative_fees);
-		if(recommendation < 0){ recommendation = 'Desired fee is too low.'; }else{ recommendation = recommendation+' sat/vB'; }
+		if(recommendation < 0){ recommendation = desired_fee+' sat/vB<br/>Low desired fee.<br/>Increase to confirm sooner.'; }else{ recommendation = recommendation+' sat/vB'; }
 		
 		var string = '<div class="card">';
 		string += '<span class="memblk"><b>Total Size:</b></span>'+accumulative_size+' vB<br/>';
