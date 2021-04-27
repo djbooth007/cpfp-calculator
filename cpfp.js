@@ -1,14 +1,14 @@
 //////////////////////////////////////////
 //
 // Child Pays For Parent Calculator
-// BETA v0.1
+// BETA v0.2
 //
 //////////////////////////////////////////
 
 var cpfp=function(){
 
 	
-	var tx_list = []; var child_tx_id; var parent_count = 0; var checked = []; var stop_api = 'N'; var api_sent_count = 0; var api_done_count = 0;
+	var tx_list = []; var child_tx_id; var parent_count = 0; var send_to_api = []; var api_is_active = 'N'; var timer;
 	
 	// check for keyboard input
 	
@@ -28,20 +28,19 @@ var cpfp=function(){
 		}
 	});
 	
-	this.start = function(){	
-		//reset
-		stop_api = 'N'; checked = []; parent_count = 0; api_sent_count = 0; api_done_count = 0;
+	this.start = function(){			
+		api_is_active = 'N'; send_to_api = []; parent_count = 0; tx_list = []; //reset
 		
-		// begin recursive backtest from child transaction
 		child_tx_id = document.getElementById('child_tx_id').value;
 				
 		if(child_tx_id != ""){
-						
+									
 			tx_list[child_tx_id] = [];
 			
-			console.log('call api... '+child_tx_id);
-			
+			send_to_api[child_tx_id] = 'N';
 			cpfp.call_api('tx/'+child_tx_id);
+			
+			cpfp.start_timer();
 
 			document.getElementById('backtest_results').innerHTML = ''; // clear previous results
 
@@ -50,12 +49,18 @@ var cpfp=function(){
 	}
 	
 	this.call_api = function(endpoint){
-		api_sent_count++;
+		api_is_active = 'Y';
+
 		var cors_proxy = 'https://cors-proxy.djbooth007.com/';	
 		var provider = cors_proxy+'https://mempool.space/api/';
 		var xhr_api = new XMLHttpRequest();
 		xhr_api.onload = function() { 
-			if(this.response !== null){ api_done_count++; cpfp.backtest(this.response); }
+			if(this.response !== null){ 
+				cpfp.backtest(this.response); 
+			}else{ 
+				clearInterval(timer);
+				document.getElementById('recommendations').innerHTML = '! invalid tx id !'; 
+			}
 		} 	
 		xhr_api.open( 'GET', provider+endpoint );
 		xhr_api.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -64,64 +69,60 @@ var cpfp=function(){
 	}
 	
 	this.backtest = function(data){
-
-		tx_list[data.txid]['confirmed'] = data.status.confirmed;
-		
-		var vsize = data.weight/4;
-		
-		tx_list[data.txid]['vsize'] = vsize;
-		tx_list[data.txid]['fee'] = data.fee;
 	
-		// only look at unconfirmed parents	
+		var txid = data.txid;
+		send_to_api[txid] = 'Y';
+		
+		tx_list[txid] = [];
+		tx_list[txid]['confirmed'] = data.status.confirmed;
+		tx_list[txid]['vsize'] = data.weight/4;
+		tx_list[txid]['fee'] = data.fee;
+		
 		if(data.status.confirmed === false){ 
-			cpfp.display_card(data.txid,vsize,data.fee); 
-
-			var list = [];			
-			for(var j = 0; j < data.vin.length; j++){ 
-				if(checked.indexOf(data.vin[j]['txid']) < 0){
-					list.push(data.vin[j]['txid']);
-					tx_list[data.vin[j]['txid']] = [];
-				}				
-			}
-
-			// continue backtesting
-			if(list.length > 0 && stop_api == 'N'){ cpfp.backtest_list(list);	}		
+			cpfp.display_card(txid,data.weight/4,data.fee);
+			for(var j = 0; j < data.vin.length; j++){ send_to_api[data.vin[j]['txid']] = 'N'; }
 		}
 		
-		// have we checked everything
-		if(data.status.confirmed === true){
+		api_is_active = 'N';
 		
-			if(child_tx_id == data.txid){
-				cpfp.child_confirmed();
-			}else{ 
-				cpfp.check_complete_list();					
-			}
-		}
-		
+		// child tx test
+		if(data.status.confirmed === true && txid == child_tx_id){ cpfp.child_confirmed(); }
 	}
 	
-	this.child_confirmed = function(){		
+	// timer monitors API calls and results.
+	
+	this.start_timer = function(){
+		timer = setInterval(function(){
+			
+			if(api_is_active == 'N'){
+				
+				// are any tx still unchecked
+				var unchecked = 0;
+				Object.keys(send_to_api).forEach(function(txid){ if(send_to_api[txid] == 'N'){ unchecked++; } });
+			
+				if(unchecked > 0){
+					
+					Object.keys(send_to_api).forEach(function(txid){ 
+						// N: not checked, Y: is checked
+						if(send_to_api[txid] == 'N'){ 
+							cpfp.call_api('tx/'+txid);
+							return;
+						}
+					});
+					
+				}else{ 
+					clearInterval(timer); 
+					cpfp.check_complete_list();
+				}			
+			}
+
+		}, 50);		
+	}
+	
+	this.child_confirmed = function(){	
+		clearInterval(timer); 	
 		cpfp.display_card(child_tx_id,tx_list[child_tx_id]['vsize'],tx_list[child_tx_id]['fee']);	
 		document.getElementById('recommendations').innerHTML = 'Child TX is already confirmed.';
-	}
-	
-	this.backtest_list = function(list){
-		var j = 0;
-		
-		Object.keys(list).forEach(function(key){
-			
-			if(checked.indexOf(list[key]) < 0){
-				setTimeout(function(){ 
-					if(stop_api == 'N'){ 
-						checked.push(list[key]);			
-						console.log('call api... '+list[key]);	
-						cpfp.call_api('tx/'+list[key]); 
-					}
-										
-				}, 500*j); // prevent bombarding API
-				j++;
-			}			
-		});			
 	}
 	
 	this.check_complete_list = function(){
@@ -131,15 +132,15 @@ var cpfp=function(){
 			if(tx_list[j]['confirmed'] == 'undefined'){ finished = 'N'; }
 		}
 
-		if(finished == 'Y'){ 
-			setTimeout(function(){ stop_api = 'Y'; cpfp.calc(); },2000);
-		}		
+		if(finished == 'Y'){ cpfp.calc(); }		
 	}
 	
 	this.calc = function(){
 			
 		var accumulative_fees = 0; var accumulative_size = 0; var unconfirmed_parent_count = 0;
-		
+	
+		console.log(child_tx_id,tx_list);
+	
 		Object.keys(tx_list).forEach(function(key){
 			if(tx_list[key]['confirmed'] == false){
 				
@@ -165,15 +166,12 @@ var cpfp=function(){
 			string += '<b>Child to Pay</b><br/>';
 			string += recommendation+'<br/>';
 		}else{
-			if(api_done_count >= api_sent_count){ string += 'All Parents Already Confirmed<br/>';	}	
+			string += 'All Parents Already Confirmed<br/>';		
 		}
 		
 		string += '</div>';
 		
 		document.getElementById('recommendations').innerHTML = string;	
-		
-		if(api_sent_count == api_done_count){ stop_api = 'Y'; }
-		if(api_sent_count < api_done_count){ setTimeout(function(){ cpfp.calc(); }, 1000); }
 	}
 	
 	this.child_to_pay = function(desired_fee, accumulative_size, accumulative_fees){
